@@ -1,0 +1,38 @@
+# Android/Gradle
+.gradle/
+build/
+*/build/
+local.properties
+
+# JetBrains IDE (Android Studio, IntelliJ)
+.idea/
+*.iml
+
+# OS generated files
+.DS_Store
+
+# Gemini (Google AI)
+.gemini/
+gemini.log
+
+# Copilot (GitHub Copilot)
+# No specific files, but ignore VSCode Copilot extension cache if present
+.vscode/
+
+# Kotlin/Java
+out/
+
+# Log files
+*.log
+
+# Misc
+*.swp
+*.swo
+
+# Ignore generated navigation files
+app/build/generated/
+app/build/intermediates/
+
+# Ignore APKs
+*.apk
+*.ap_
