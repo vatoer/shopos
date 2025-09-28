@@ -12,6 +12,8 @@ import id.stargan.shopos.screens.LaporanScreen
 import id.stargan.shopos.screens.PengaturanScreen
 import id.stargan.shopos.screens.ProdukScreen
 import id.stargan.shopos.screens.PesananScreen
+import id.stargan.shopos.screens.DetailPesananScreen
+import id.stargan.shopos.screens.PesananSingleton
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.tooling.preview.Preview
@@ -77,6 +79,9 @@ fun AppNavigation() {
             composable(TabItem.Produk.route) { ProdukScreen(navController) }
             composable(TabItem.Laporan.route) { LaporanScreen(navController) }
             composable(TabItem.Pengaturan.route) { PengaturanScreen(navController) }
+            composable("detail_pesanan") {
+                DetailPesananScreen(navController, PesananSingleton.pesanan)
+            }
         }
     }
 }
