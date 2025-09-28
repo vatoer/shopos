@@ -2,7 +2,11 @@ package id.stargan.shopos
 
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,6 +26,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.getValue
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 
 sealed class TabItem(val route: String, val icon: ImageVector, val label: String) {
     object Kasir : TabItem("kasir", Icons.Default.ShoppingCart, "Kasir")
@@ -66,8 +72,9 @@ fun BottomNavigationBar(navController: androidx.navigation.NavHostController) {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+    val showTabBar = remember { mutableStateOf(true) }
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController) }
+        bottomBar = { if (showTabBar.value) BottomNavigationBar(navController) }
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -78,7 +85,9 @@ fun AppNavigation() {
             composable(TabItem.Pesanan.route) { PesananScreen(navController) }
             composable(TabItem.Produk.route) { ProdukScreen(navController) }
             composable(TabItem.Laporan.route) { LaporanScreen(navController) }
-            composable(TabItem.Pengaturan.route) { PengaturanScreen(navController) }
+            composable(TabItem.Pengaturan.route) {
+                PengaturanScreen(navController, showTabBar = { showTabBar.value = it })
+            }
             composable("detail_pesanan") {
                 DetailPesananScreen(navController, PesananSingleton.pesanan)
             }
