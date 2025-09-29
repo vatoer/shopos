@@ -19,9 +19,9 @@ import androidx.navigation.NavController
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.background
 import id.stargan.shopos.screens.pengaturan.KategoriScreen
-import id.stargan.shopos.data.repository.KategoriProdukRepository
-import androidx.compose.ui.platform.LocalContext
+import id.stargan.shopos.data.KategoriRepository
 import id.stargan.shopos.data.db.AppDatabase
+import androidx.compose.ui.platform.LocalContext
 
 sealed class PengaturanMenu(val title: String) {
     object ProfilToko : PengaturanMenu("Profil Toko")
@@ -109,9 +109,9 @@ fun PengaturanSubScreen(menu: PengaturanMenu, onBack: () -> Unit) {
                 PengaturanMenu.ProfilToko -> ProfilTokoSetting()
                 PengaturanMenu.Pengguna -> PenggunaSetting()
                 PengaturanMenu.KategoriProduk -> {
-                    val context = LocalContext.current
-                    val kategoriDao = remember { AppDatabase.getDatabase(context).kategoriProdukDao() }
-                    val kategoriRepo = remember { KategoriProdukRepository(kategoriDao) }
+                    val context = LocalContext.current.applicationContext
+                    val kategoriDao = remember { id.stargan.shopos.data.db.DatabaseProvider.getDatabase(context).kategoriDao() }
+                    val kategoriRepo = remember { id.stargan.shopos.data.KategoriRepository(kategoriDao) }
                     KategoriScreen(repository = kategoriRepo)
                 }
                 PengaturanMenu.Diskon -> DiskonSetting()

@@ -11,11 +11,15 @@ import id.stargan.shopos.data.dao.KategoriProdukDao
 import id.stargan.shopos.data.dao.PenggunaDao
 import id.stargan.shopos.data.dao.ProfilTokoDao
 import id.stargan.shopos.data.dao.PromoDao
+import id.stargan.shopos.data.ProdukDao
+import id.stargan.shopos.data.KategoriDao
 import id.stargan.shopos.data.entity.DiskonEntity
 import id.stargan.shopos.data.entity.KategoriProdukEntity
 import id.stargan.shopos.data.entity.PenggunaEntity
 import id.stargan.shopos.data.entity.ProfilTokoEntity
 import id.stargan.shopos.data.entity.PromoEntity
+import id.stargan.shopos.data.ProdukEntity
+import id.stargan.shopos.data.KategoriEntity
 
 @Database(
     entities = [
@@ -24,9 +28,11 @@ import id.stargan.shopos.data.entity.PromoEntity
         KategoriProdukEntity::class,
         DiskonEntity::class,
         PromoEntity::class,
+        ProdukEntity::class,
+        KategoriEntity::class,
         // Tambahkan entitas lain di sini jika ada, misal: ProdukEntity, OrderEntity, dll.
     ],
-    version = 1, // Naikkan versi jika Anda mengubah skema di masa mendatang
+    version = 2, // Naikkan versi jika Anda mengubah skema di masa mendatang
     exportSchema = true // Ekspor skema ke file JSON (baik untuk version control dan migrasi)
 )
 @TypeConverters(Converters::class)
@@ -37,6 +43,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun kategoriProdukDao(): KategoriProdukDao
     abstract fun diskonDao(): DiskonDao
     abstract fun promoDao(): PromoDao
+    abstract fun produkDao(): ProdukDao
+    abstract fun kategoriDao(): KategoriDao
     // Tambahkan abstract fun untuk DAO lain di sini
 
     companion object {

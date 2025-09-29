@@ -28,6 +28,14 @@ import androidx.compose.runtime.getValue
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
+import id.stargan.shopos.data.db.DatabaseProvider
+import id.stargan.shopos.data.ProdukRepository
+import id.stargan.shopos.data.KategoriRepository
+import id.stargan.shopos.viewmodel.ProdukViewModel
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import id.stargan.shopos.viewmodel.ProdukViewModelFactory
+
 
 sealed class TabItem(val route: String, val icon: ImageVector, val label: String) {
     object Kasir : TabItem("kasir", Icons.Default.ShoppingCart, "Kasir")
@@ -83,7 +91,16 @@ fun AppNavigation() {
         ) {
             composable(TabItem.Kasir.route) { KasirScreen(navController) }
             composable(TabItem.Pesanan.route) { PesananScreen(navController) }
-            composable(TabItem.Produk.route) { ProdukScreen(navController) }
+            composable(TabItem.Produk.route) {
+                val context = LocalContext.current.applicationContext
+                val db = DatabaseProvider.getDatabase(context)
+                val produkRepository = ProdukRepository(db.produkDao())
+                val kategoriRepository = KategoriRepository(db.kategoriDao())
+                val produkViewModel: id.stargan.shopos.viewmodel.ProdukViewModel = viewModel(
+                    factory = ProdukViewModelFactory(produkRepository, kategoriRepository)
+                )
+                ProdukScreen(navController, produkViewModel)
+            }
             composable(TabItem.Laporan.route) { LaporanScreen(navController) }
             composable(TabItem.Pengaturan.route) {
                 PengaturanScreen(navController, showTabBar = { showTabBar.value = it })
