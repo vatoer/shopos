@@ -35,6 +35,8 @@ import id.stargan.shopos.viewmodel.ProdukViewModel
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import id.stargan.shopos.viewmodel.ProdukViewModelFactory
+import id.stargan.shopos.viewmodel.KasirViewModel
+import id.stargan.shopos.viewmodel.KasirViewModelFactory
 
 
 sealed class TabItem(val route: String, val icon: ImageVector, val label: String) {
@@ -89,7 +91,15 @@ fun AppNavigation() {
             startDestination = TabItem.Kasir.route,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable(TabItem.Kasir.route) { KasirScreen(navController) }
+            composable(TabItem.Kasir.route) {
+                val context = LocalContext.current.applicationContext
+                val db = DatabaseProvider.getDatabase(context)
+                val produkRepository = ProdukRepository(db.produkDao())
+                val kasirViewModel: KasirViewModel = viewModel(
+                    factory = KasirViewModelFactory(produkRepository)
+                )
+                KasirScreen(navController, kasirViewModel)
+            }
             composable(TabItem.Pesanan.route) { PesananScreen(navController) }
             composable(TabItem.Produk.route) {
                 val context = LocalContext.current.applicationContext

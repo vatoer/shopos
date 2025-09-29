@@ -24,12 +24,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import id.stargan.shopos.ui.theme.ShoposTheme
 import androidx.compose.foundation.clickable
 import id.stargan.shopos.TabItem
+import id.stargan.shopos.viewmodel.KasirViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.navigation.NavController
+import id.stargan.shopos.data.ProdukEntity
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.TextFieldValue
 
 // Data models
-data class Produk(val idProduk: Int, val namaProduk: String, val hargaProduk: Int)
-data class ItemPesanan(val produk: Produk, var jumlah: Int)
+data class ItemPesanan(val produk: ProdukEntity, var jumlah: Int)
 enum class StatusOrder { ANTRIAN, SELESAI }
 enum class StatusBayar { LUNAS, MENUNGGU }
 data class Pesanan(
@@ -65,10 +72,10 @@ fun PencarianProduk(kataKunci: String, onKataKunciChange: (String) -> Unit) {
 // ProdukList Composable
 @Composable
 fun ProdukList(
-    daftarProduk: List<Produk>,
+    daftarProduk: List<ProdukEntity>,
     jumlahMap: Map<Int, Int>,
-    onTambah: (Produk) -> Unit,
-    onKurang: (Produk) -> Unit
+    onTambah: (ProdukEntity) -> Unit,
+    onKurang: (ProdukEntity) -> Unit
 ) {
     Column {
         if (daftarProduk.isEmpty()) {
@@ -80,8 +87,8 @@ fun ProdukList(
             ) {
                 items(daftarProduk.size) { idx ->
                     val produk = daftarProduk[idx]
-                    val jumlah = jumlahMap[produk.idProduk] ?: 0
-                    val totalPerProduk = jumlah * produk.hargaProduk
+                    val jumlah = jumlahMap[produk.id] ?: 0
+                    val totalPerProduk = jumlah * produk.harga.toInt()
                     val isOdd = idx % 2 == 1
                     val rowBg = if (isOdd) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
                     Row(
@@ -92,14 +99,13 @@ fun ProdukList(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Column(Modifier.weight(1f)) {
-                            Text(produk.namaProduk, fontWeight = FontWeight.Medium, fontSize = 20.sp)
+                        Column(Modifier.weight(2f)) {
+                            Text("SKU: ${produk.sku}", fontWeight = FontWeight.Medium, fontSize = 14.sp)
+                            Text(produk.nama, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("Rp${formatRupiah(produk.hargaProduk)}", fontSize = 14.sp)
-                                if (jumlah > 0) {
-                                    Spacer(Modifier.width(8.dp))
-                                    Text("x $jumlah = Rp${formatRupiah(totalPerProduk)}", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
-                                }
+                                Text("Harga: Rp${formatRupiah(produk.harga.toInt())}", fontSize = 14.sp)
+                                Spacer(Modifier.width(8.dp))
+                                Text("Stok: ${produk.stok}", fontSize = 14.sp)
                             }
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -197,66 +203,30 @@ fun InfoSection(
 // Main KasirScreen Composable
 @Composable
 fun KasirScreen(
-    navController: androidx.navigation.NavHostController? = null,
-    pesananId: Int = -1 // -1 for new, >=0 for editing
+    navController: NavController,
+    kasirViewModel: KasirViewModel
 ) {
-    val daftarProduk = remember {
-        mutableStateOf(
-            listOf(
-                Produk(1, "Kopi Hitam", 15000),
-                Produk(2, "Kopi Susu", 20000),
-                Produk(3, "Teh Tarik", 18000),
-                Produk(4, "Roti", 10000),
-                Produk(5, "Air Mineral", 8000),
-                Produk(6, "Nasi Goreng", 25000),
-                Produk(7, "Mie Ayam", 22000),
-                Produk(8, "Es Teh", 7000),
-                Produk(9, "Es Jeruk", 9000),
-                Produk(10, "Kue Lapis", 12000),
-                Produk(11, "Kue Cubit", 15000),
-                Produk(12, "Kue Putu", 13000),
-                Produk(13, "Kue Pancong", 14000),
-                Produk(14, "Kue Apem", 11000),
-                Produk(15, "Kue Serabi", 16000),
-                Produk(16, "Kue Lumpur", 17000),
-                Produk(17, "Kue Talam", 18000),
-                Produk(18, "Kue Bugis", 19000),
-                Produk(19, "Kue Dadar Gulung", 20000),
-                Produk(20, "Kue Klepon", 21000),
-                Produk(21, "Kue Onde-onde", 22000),
-                Produk(22, "Kue Rangi", 23000),
-                Produk(23, "Kue Bika Ambon", 24000),
-                Produk(24, "Kue Lapis Legit", 25000),
-                Produk(25, "Kue Nastar", 26000),
-                Produk(26, "Kue Kastengel", 27000),
-                Produk(27, "Kue Putri Salju", 28000),
-                Produk(28, "Kue Semprit", 29000),
-                Produk(29, "Kue Sagu", 30000),
-                Produk(30, "Kue Kering", 31000),
-                Produk(31, "Kue Basah", 32000)
-            )
-        )
-    }
+    val daftarProduk by kasirViewModel.daftarProduk.collectAsState()
     val kataKunci = remember { mutableStateOf("") }
     val pesanan = remember { mutableStateOf(Pesanan()) }
     val showDialogBayar = remember { mutableStateOf(false) }
     val showDialogSimpan = remember { mutableStateOf(false) }
     val showOnlySelected = remember { mutableStateOf(false) }
 
-    val produkTersaring = if (kataKunci.value.isBlank()) daftarProduk.value else daftarProduk.value.filter {
-        it.namaProduk.contains(kataKunci.value, ignoreCase = true)
+    val produkTersaring = if (kataKunci.value.isBlank()) daftarProduk else daftarProduk.filter {
+        it.nama.contains(kataKunci.value, ignoreCase = true)
     }
-    val jumlahMap = pesanan.value.daftarItem.groupBy({ it.produk.idProduk }, { it.jumlah }).mapValues { it.value.sum() }
-    val cartItems = daftarProduk.value.mapNotNull { produk ->
-        val jumlah = jumlahMap[produk.idProduk] ?: 0
+    val jumlahMap = pesanan.value.daftarItem.groupBy({ it.produk.id }, { it.jumlah }).mapValues { it.value.sum() }
+    val cartItems = daftarProduk.mapNotNull { produk ->
+        val jumlah = jumlahMap[produk.id] ?: 0
         if (jumlah > 0) ItemPesanan(produk, jumlah) else null
     }
     val jumlahProduk = cartItems.size
     val jumlahItem = cartItems.sumOf { it.jumlah }
-    val totalHarga = cartItems.sumOf { it.jumlah * it.produk.hargaProduk }
+    val totalHarga = cartItems.sumOf { it.jumlah * it.produk.harga.toInt() }
 
     val produkListToShow = if (showOnlySelected.value) {
-        daftarProduk.value.filter { jumlahMap[it.idProduk] ?: 0 > 0 }
+        daftarProduk.filter { jumlahMap[it.id] ?: 0 > 0 }
     } else {
         produkTersaring
     }
@@ -336,9 +306,9 @@ fun KasirScreen(
 }
 
 // Helper functions
-fun tambahItemKePesanan(pesanan: Pesanan, produk: Produk): Pesanan {
+fun tambahItemKePesanan(pesanan: Pesanan, produk: ProdukEntity): Pesanan {
     val daftarBaru = pesanan.daftarItem.map { it.copy() }.toMutableList()
-    val item = daftarBaru.find { it.produk.idProduk == produk.idProduk }
+    val item = daftarBaru.find { it.produk.id == produk.id }
     if (item != null) {
         item.jumlah++
     } else {
@@ -347,9 +317,9 @@ fun tambahItemKePesanan(pesanan: Pesanan, produk: Produk): Pesanan {
     return pesanan.copy(daftarItem = daftarBaru)
 }
 
-fun kurangiItemDariPesanan(pesanan: Pesanan, produk: Produk): Pesanan {
+fun kurangiItemDariPesanan(pesanan: Pesanan, produk: ProdukEntity): Pesanan {
     val daftarBaru = pesanan.daftarItem.map { it.copy() }.toMutableList()
-    val item = daftarBaru.find { it.produk.idProduk == produk.idProduk }
+    val item = daftarBaru.find { it.produk.id == produk.id }
     if (item != null) {
         item.jumlah--
         if (item.jumlah <= 0) daftarBaru.remove(item)
@@ -376,37 +346,14 @@ fun DefaultPreview() {
     ShoposTheme {
         // Sample data
         val sampleProduk = listOf(
-            Produk(1, "Kopi Hitam", 15000),
-            Produk(2, "Kopi Susu", 20000),
-            Produk(3, "Teh Tarik", 18000),
-            Produk(4, "Roti", 10000),
-            Produk(5, "Air Mineral", 8000),
-            Produk(6, "Nasi Goreng", 25000),
-            Produk(7, "Mie Ayam", 22000),
-            Produk(8, "Es Teh", 7000),
-            Produk(9, "Es Jeruk", 9000),
-            Produk(10, "Kue Lapis", 12000),
-            Produk(11, "Kue Cubit", 15000),
-            Produk(12, "Kue Putu", 13000),
-            Produk(13, "Kue Pancong", 14000),
-            Produk(14, "Kue Apem", 11000),
-            Produk(15, "Kue Serabi", 16000),
-            Produk(16, "Kue Lumpur", 17000),
-            Produk(17, "Kue Talam", 18000),
-            Produk(18, "Kue Bugis", 19000),
-            Produk(19, "Kue Dadar Gulung", 20000),
-            Produk(20, "Kue Klepon", 21000),
-            Produk(21, "Kue Onde-onde", 22000),
-            Produk(22, "Kue Rangi", 23000),
-            Produk(23, "Kue Bika Ambon", 24000),
-            Produk(24, "Kue Lapis Legit", 25000),
-            Produk(25, "Kue Nastar", 26000),
-            Produk(26, "Kue Kastengel", 27000),
-            Produk(27, "Kue Putri Salju", 28000),
-            Produk(28, "Kue Semprit", 29000),
-            Produk(29, "Kue Sagu", 30000),
-            Produk(30, "Kue Kering", 31000),
-            Produk(31, "Kue Basah", 32000)
+            ProdukEntity(
+                id = 1, // Explicitly a Long value
+                sku = "SKU10023",
+                nama = "Kopi Robusta Premium",
+                harga = 75000, // Int value
+                kategoriId = 1, // Explicitly a Long value (assuming 5 is an ID of a KategoriProdukEntity)
+                stok = 50 // Int value
+            )
         )
 
         // State for search keyword
@@ -416,7 +363,7 @@ fun DefaultPreview() {
         val filteredProduk = if (searchKeyword.value.isBlank()) {
             sampleProduk
         } else {
-            sampleProduk.filter { it.namaProduk.contains(searchKeyword.value, ignoreCase = true) }
+            sampleProduk.filter { it.nama.contains(searchKeyword.value, ignoreCase = true) }
         }
 
         Column(Modifier.padding(16.dp)) {
@@ -445,9 +392,9 @@ fun PreviewPencarianProduk() {
 fun PreviewProdukList() {
     ProdukList(
         daftarProduk = listOf(
-            Produk(1, "Kopi Hitam", 15000),
-            Produk(2, "Kopi Susu", 20000),
-            Produk(3, "Teh Tarik", 18000)
+            ProdukEntity(1, "SKU001", "Kopi Hitam", 15000, 1, 10),
+            ProdukEntity(2, "SKU002", "Kopi Susu", 20000, 1, 15),
+            ProdukEntity(3, "SKU003", "Teh Tarik", 18000, 1, 20)
         ),
         jumlahMap = mapOf(),
         onTambah = {},
@@ -461,7 +408,7 @@ fun PreviewRingkasanActions() {
     RingkasanActions(
         pesanan = Pesanan(
             daftarItem = mutableListOf(
-                ItemPesanan(Produk(1, "Kopi Hitam", 15000), 2)
+                ItemPesanan(ProdukEntity(1, "SKU001", "Kopi Hitam", 15000, 1, 10), 2)
             )
         ),
         onSimpan = {},
@@ -483,5 +430,11 @@ fun PreviewInfoSection() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewKasirScreen() {
-    KasirScreen()
+    // Buat ViewModel dengan data dummy tanpa repository
+    val dummyProduk = listOf(
+        ProdukEntity(1, "SKU001", "Kopi Hitam", 15000, 1, 10),
+        ProdukEntity(2, "SKU002", "Kopi Susu", 20000, 1, 15)
+    )
+    val kasirViewModel = KasirViewModel.preview(dummyProduk)
+    KasirScreen(navController = rememberNavController(), kasirViewModel = kasirViewModel)
 }

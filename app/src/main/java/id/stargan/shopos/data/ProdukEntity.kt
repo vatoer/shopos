@@ -20,12 +20,12 @@ data class ProdukEntity(
     val id: Int = 0,
     @ColumnInfo(name = "sku")
     val sku: String,
-    @ColumnInfo(name = "namaProduk")
-    val namaProduk: String,
+    @ColumnInfo(name = "nama")
+    val nama: String,
     @ColumnInfo(name = "kategoriId")
     val kategoriId: Int,
     @ColumnInfo(name = "harga")
-    val harga: Double,
+    val harga: Int,
     @ColumnInfo(name = "stok")
     val stok: Int
 )

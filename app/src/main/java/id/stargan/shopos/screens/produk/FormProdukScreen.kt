@@ -17,7 +17,7 @@ fun FormProdukScreen(
     onSimpanProduk: (ProdukEntity) -> Unit
 ) {
     var sku by remember { mutableStateOf(produkAwal?.sku ?: "") }
-    var namaProduk by remember { mutableStateOf(produkAwal?.namaProduk ?: "") }
+    var namaProduk by remember { mutableStateOf(produkAwal?.nama ?: "") }
     var kategoriId by remember { mutableStateOf(produkAwal?.kategoriId ?: 0) }
     var harga by remember { mutableStateOf(produkAwal?.harga?.toString() ?: "") }
     var stok by remember { mutableStateOf(produkAwal?.stok?.toString() ?: "") }
@@ -82,9 +82,9 @@ fun FormProdukScreen(
                 val produk = ProdukEntity(
                     id = produkAwal?.id ?: 0,
                     sku = sku,
-                    namaProduk = namaProduk,
+                    nama = namaProduk,
                     kategoriId = kategoriId,
-                    harga = harga.toDoubleOrNull() ?: 0.0,
+                    harga = harga.toIntOrNull() ?: 0,
                     stok = stok.toIntOrNull() ?: 0
                 )
                 onSimpanProduk(produk)

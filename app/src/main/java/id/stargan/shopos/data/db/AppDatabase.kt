@@ -32,7 +32,7 @@ import id.stargan.shopos.data.KategoriEntity
         KategoriEntity::class,
         // Tambahkan entitas lain di sini jika ada, misal: ProdukEntity, OrderEntity, dll.
     ],
-    version = 2, // Naikkan versi jika Anda mengubah skema di masa mendatang
+    version = 3, // Naikkan versi jika Anda mengubah skema di masa mendatang
     exportSchema = true // Ekspor skema ke file JSON (baik untuk version control dan migrasi)
 )
 @TypeConverters(Converters::class)

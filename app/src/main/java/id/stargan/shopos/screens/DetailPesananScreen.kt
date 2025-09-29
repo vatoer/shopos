@@ -33,15 +33,18 @@ fun DetailPesananScreen(
             Spacer(Modifier.height(8.dp))
             pesanan.daftarItem.forEach { item ->
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(item.produk.namaProduk)
-                    Text("${item.jumlah} x Rp${item.produk.hargaProduk} = Rp${item.jumlah * item.produk.hargaProduk}")
+                    Column {
+                        Text("SKU: ${item.produk.sku}", style = MaterialTheme.typography.labelMedium)
+                        Text(item.produk.nama)
+                    }
+                    Text("${item.jumlah} x Rp${item.produk.harga} = Rp${item.jumlah * item.produk.harga}")
                 }
                 Divider()
             }
             Spacer(Modifier.height(16.dp))
             val jumlahProduk = pesanan.daftarItem.size
             val jumlahItem = pesanan.daftarItem.sumOf { it.jumlah }
-            val totalHarga = pesanan.daftarItem.sumOf { it.jumlah * it.produk.hargaProduk }
+            val totalHarga = pesanan.daftarItem.sumOf { it.jumlah * it.produk.harga }
             Text("${jumlahProduk} produk, ${jumlahItem} item", style = MaterialTheme.typography.bodyMedium)
             Text("Total: Rp${totalHarga}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
         }

@@ -17,9 +17,9 @@ import androidx.room.ForeignKey
 )
 data class ProdukEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val sku: String,
     val nama: String,
     val harga: Int,
     val kategoriId: Long,
     val stok: Int
 )
-

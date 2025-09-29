@@ -20,7 +20,7 @@ fun ItemProduk(
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = produk.namaProduk, style = MaterialTheme.typography.titleMedium)
+            Text(text = produk.nama, style = MaterialTheme.typography.titleMedium)
             Text(text = "SKU: ${produk.sku}", style = MaterialTheme.typography.bodySmall)
             Text(text = "Harga: Rp${produk.harga}", style = MaterialTheme.typography.bodySmall)
             Text(text = "Stok: ${produk.stok}", style = MaterialTheme.typography.bodySmall)

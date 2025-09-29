@@ -62,7 +62,7 @@ fun ProdukScreen(
     // Dialog hapus produk
     if (tampilDialogHapus && produkDipilih != null) {
         DialogHapusProduk(
-            namaProduk = produkDipilih!!.namaProduk,
+            namaProduk = produkDipilih!!.nama,
             onKonfirmasi = {
                 produkViewModel.hapusProduk(produkDipilih!!)
                 tampilDialogHapus = false
